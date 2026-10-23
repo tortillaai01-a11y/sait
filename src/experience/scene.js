@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getStoryState } from './story-state.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
@@ -23,8 +24,9 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
  const violetLight=new THREE.MeshStandardMaterial({color:'#cfbcff',emissive:'#8a60ff',emissiveIntensity:1.8});
  const chrome=new THREE.MeshStandardMaterial({color:'#e5e6e7',metalness:1,roughness:.13});
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.12}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.position.y=-.02;scene.add(ground);
- const turntable=new THREE.Mesh(new THREE.CylinderGeometry(4.65,4.7,.07,100),new THREE.MeshStandardMaterial({color:'#c7bfd0',metalness:.15,roughness:.8}));turntable.position.y=-.075;turntable.receiveShadow=true;scene.add(turntable);
- const ring=new THREE.Mesh(new THREE.TorusGeometry(4.7,.008,6,128),purple);ring.rotation.x=Math.PI/2;ring.position.y=-.025;scene.add(ring);
+ const turntable=new THREE.Mesh(new THREE.CylinderGeometry(4.65,4.7,.07,100),new THREE.MeshStandardMaterial({color:'#c7bfd0',metalness:.15,roughness:.8,transparent:true}));turntable.material.depthWrite=false;turntable.position.y=-.075;turntable.receiveShadow=true;scene.add(turntable);
+ const ringMaterial=purple.clone();ringMaterial.transparent=true;ringMaterial.depthWrite=false;
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(4.7,.008,6,128),ringMaterial);ring.rotation.x=Math.PI/2;ring.position.y=-.025;scene.add(ring);
  const truck=new THREE.Group();scene.add(truck);
  const chassis=new THREE.Group();truck.add(chassis);
  function mesh(geo,mat,parent,x=0,y=0,z=0){const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
@@ -107,47 +109,73 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
  }
  [-.4,.4].forEach(z=>{const pipe=cyl(.07,.07,1.48,chrome,engine,0,.42,z);pipe.rotation.z=Math.PI/2;});
  const engineFan=mesh(new THREE.TorusGeometry(.23,.04,8,24),silver,engine,-.8,.42,0);engineFan.rotation.y=Math.PI/2;
- const service=new THREE.Group();scene.add(service);service.visible=false;
- const serviceWheel=wheel(service,0,1.8,0);serviceWheel.scale.setScalar(2.5);serviceWheel.rotation.y=-.2;
- const serviceRing=mesh(new THREE.TorusGeometry(1.9,.012,6,100),purple,service,0,1.8,0);
- const scanner=box(4,.015,.015,violetLight,service,0,1.8,1.6,.005);
- const route=new THREE.Group();scene.add(route);route.visible=false;
- const points=[new THREE.Vector3(-4,.02,.6),new THREE.Vector3(-2,.02,-1.5),new THREE.Vector3(0,.02,-.9),new THREE.Vector3(2,.02,1.2),new THREE.Vector3(4,.02,.3)];
- const curve=new THREE.CatmullRomCurve3(points);
- mesh(new THREE.TubeGeometry(curve,120,.045,8,false),purple,route);
- const road=mesh(new THREE.TubeGeometry(curve,120,.18,8,false),new THREE.MeshStandardMaterial({color:'#d7d1e4',roughness:.8}),route);road.scale.y=.05;road.position.y=-.005;
- [points[0],points[4]].forEach(p=>{const marker=cyl(.1,.1,.07,purple,route,p.x,.07,p.z);const r=mesh(new THREE.TorusGeometry(.28,.02,8,40),purple,route,p.x,.04,p.z);r.rotation.x=Math.PI/2;});
+ // A full-size road grows out of the studio floor. The same assembled truck
+ // follows it; no miniature replacement or separate service-wheel scene.
+ const route=new THREE.Group();scene.add(route);
+ const driveCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(0,0,0),new THREE.Vector3(-.7,0,0),
+  new THREE.Vector3(-1.5,0,-2),new THREE.Vector3(.8,0,-4),new THREE.Vector3(6.6,0,-4),
+ ]);
+ const roadCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(4.5,.005,0),new THREE.Vector3(0,.005,0),
+  new THREE.Vector3(-1.5,.005,-2),new THREE.Vector3(.8,.005,-4),new THREE.Vector3(8,.005,-4),
+ ]);
+ const roadMaterial=new THREE.MeshBasicMaterial({color:'#c7c0d0',transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+ const roadLineMaterial=new THREE.MeshBasicMaterial({color:'#a08cb8',transparent:true,opacity:0,depthWrite:false});
+ function roadStrip(curve,width){
+  const vertices=[],indices=[];
+  for(let i=0;i<=100;i++){
+   const t=i/100,p=curve.getPoint(t),tangent=curve.getTangent(t);
+   const side=new THREE.Vector3(-tangent.z,0,tangent.x).normalize().multiplyScalar(width/2);
+   vertices.push(p.x+side.x,p.y,p.z+side.z,p.x-side.x,p.y,p.z-side.z);
+   if(i<100){const n=i*2;indices.push(n,n+1,n+2,n+1,n+3,n+2);}
+  }
+  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geometry.setIndex(indices);geometry.computeVertexNormals();return geometry;
+ }
+ const roadMesh=mesh(roadStrip(roadCurve,2.75),roadMaterial,route);roadMesh.castShadow=false;roadMesh.receiveShadow=false;
+ const centerline=mesh(new THREE.TubeGeometry(roadCurve,100,.018,6,false),roadLineMaterial,route);centerline.position.y=.01;centerline.castShadow=false;
+ const guide=new THREE.Group();truck.add(guide);
+ const guideMaterial=new THREE.LineBasicMaterial({color:'#a58bc4',transparent:true,opacity:.3});
+ [-1,1].forEach(sign=>{
+  const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-2.1,.65,sign*1.02),new THREE.Vector3(-2.1,.65,sign*2.05)]);
+  guide.add(new THREE.Line(geo,guideMaterial));
+ });
   let progress=0;let drag=0;let down=false;let px=0;let disposed=false;let inView=true;let frame=0;let lastTime=0;let autoAngle=0;
- const initialCab=cab.position.clone();
  function resize(){const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.fov=rect.width<600?39:31;camera.updateProjectionMatrix();}
- const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(canvas);resize();
+ resize();
  const visibility=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)requestRender();});visibility.observe(canvas);
-  const smooth=(a,b,p)=>THREE.MathUtils.smoothstep(p,a,b);
  function render(time=0){
   frame=0;if(disposed||document.hidden||!inView)return;
   const dt=Math.min((time-lastTime)/1000,.05)||0;lastTime=time;
   if(!reducedMotion&&!down)autoAngle+=dt*.045;
-  const phase=progress*3;
-  const explode=smooth(.2,.9,phase)*(1-smooth(1.05,1.65,phase));
-  const isService=phase>=1.55&&phase<2.58;const isRoute=phase>=2.58;
-  truck.visible=!isService;service.visible=isService;route.visible=isRoute;
-  const angle=drag+(reducedMotion?0:Math.sin(autoAngle)*.1);
-  truck.rotation.y=angle+(isRoute?-.15:0);
-  cab.position.copy(initialCab);cab.position.y=explode*1.55;cab.position.x=-explode*.45;
-  engine.position.set(-1.4+explode*.3,1.17+explode*.85,0);
-  wheels.forEach(w=>{w.position.copy(w.userData.base);w.position.z+=Math.sign(w.position.z)*explode*.85;w.rotation.z=isRoute?-time*.0005:0;});
-  tanks.forEach(t=>{t.position.copy(t.userData.base);t.position.z+=Math.sign(t.position.z)*explode*.8;});
-  if(isRoute){
-   const t=reducedMotion?.52:Math.max(.12,Math.min(.88,.06+(phase-2.58)*2.1));const p=curve.getPoint(t);const tangent=curve.getTangent(t);
-   truck.scale.setScalar(.34);truck.position.set(p.x,.04,p.z);truck.rotation.y=Math.atan2(tangent.z,-tangent.x)+drag*.25;
-  }else{truck.scale.setScalar(1);truck.position.set(0,0,0);}
-  service.rotation.y=angle*.7;
-  serviceWheel.rotation.z=reducedMotion?0:Math.sin(time*.0003)*.14;
-  scanner.position.y=1.8+(reducedMotion?0:Math.sin(time*.0015)*1.35);
-  serviceRing.rotation.z=reducedMotion?0:time*.00005;
-  const targetY=isService?1.7:isRoute?.25:explode>.2?1.8:1.4;
-  camera.zoom=canvas.clientWidth<600?(isService?1.4:isRoute?1.12:explode>.2?1.17:1.45):1.08;camera.updateProjectionMatrix();
-  camera.lookAt(0,targetY,0);
+  const state=getStoryState(progress);
+  // Stagger the assembly so the eye can follow each group of components.
+  cab.position.set(-state.cabLift*.45,state.cabLift*1.55,0);
+  engine.position.set(-1.4+state.engineLift*.45,1.17+state.engineLift*.9,0);
+  wheels.forEach(w=>{
+   w.position.copy(w.userData.base);
+   w.position.z+=Math.sign(w.position.z)*state.wheelSpread*.9;
+   w.rotation.z=state.departure*18;
+  });
+  tanks.forEach(t=>{t.position.copy(t.userData.base);t.position.z+=Math.sign(t.position.z)*state.tankSpread*.8;});
+  const drive=driveCurve.getPoint(state.departure);
+  const tangent=driveCurve.getTangent(state.departure);
+  const idle=reducedMotion?0:Math.sin(autoAngle)*.08;
+  truck.position.copy(drive);
+  truck.rotation.y=Math.atan2(tangent.z,-tangent.x)+(drag+idle)*(1-state.departure*.85);
+  // Rotate toward the road gradually, with a continuous size throughout.
+  truck.scale.setScalar(1);
+  turntable.material.opacity=1-state.road;ringMaterial.opacity=1-state.road;
+  roadMaterial.opacity=state.road*.85;roadLineMaterial.opacity=state.road*.8;
+  guideMaterial.opacity=state.wheelSpread*.28;guide.visible=state.wheelSpread>.01;
+  violetLight.emissiveIntensity=.4+state.assembly*1.4;
+  const mobile=canvas.clientWidth<600;
+  const zoom=mobile?THREE.MathUtils.lerp(1.08,1.4,state.assembly)-state.departure*.18:THREE.MathUtils.lerp(.96,1.08,state.assembly)-state.departure*.12;
+  if(camera.zoom!==zoom){camera.zoom=zoom;camera.updateProjectionMatrix();}
+  camera.position.set(-10+state.departure*1.5,6.3+state.departure*.5,11.5+state.departure);
+  camera.lookAt(drive.x*.15,1.4+(1-state.assembly)*.4,drive.z*.15);
+  // State metadata is useful for accessibility diagnostics and smoke tests.
+  canvas.dataset.pose=state.departure>0?'departing':state.assembly>=1?'assembled':state.assembly>0?'assembling':'exploded';
   renderer.render(scene,camera);
   if(!reducedMotion&&!document.hidden&&inView)frame=requestAnimationFrame(render);
  }
@@ -157,7 +185,6 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
  const release=()=>{down=false;canvas.classList.remove('is-dragging');};canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
  canvas.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();drag+=e.key==='ArrowLeft'?-.15:.15;requestRender();}});
  document.addEventListener('visibilitychange',requestRender);
- resizeObserver.disconnect(); // Install a redraw-aware resize callback after renderer construction.
  const observer=new ResizeObserver(()=>{resize();requestRender();});observer.observe(canvas);
  renderer.render(scene,camera);requestRender();
  return {

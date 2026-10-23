@@ -10,3 +10,6 @@
 @media(max-width:1050px){.x-motion-toggle{bottom:18%;font-size:6px}}
 @media(max-width:700px){.x-motion-toggle{bottom:17%;right:6%;font-size:5px;min-height:26px;padding:6px 8px}.x-orbit-label{bottom:13.3%}}
 .x-logo img{width:120px;height:auto;display:block;object-fit:contain}.x-header .x-logo{align-self:center}.x-footer .x-logo img{width:103px}@media(max-width:700px){.x-header .x-logo img{width:87px}.x-footer .x-logo img{width:91px}}
+/* Three connected acts: parts -> repair/assembly -> departure. */
+.x-story{height:360svh}.x-chapters{gap:42px}.x-chapter-copy h1{font-size:clamp(50px,5.3vw,84px)}.x-primary{box-shadow:0 4px 0 #110d1799;transition:background .2s,transform .2s,box-shadow .2s}.x-primary:hover{transform:translateY(-2px);box-shadow:0 6px 0 #110d1744}.x-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #110d1755}.x-direction:active .x-direction-arrow{transform:scale(.9)}.x-chapters button{transition:color .2s,transform .2s}.x-chapters button:active{transform:translateY(2px)}
+@media(max-width:700px){.x-story{height:350svh}.x-chapter-copy h1{font-size:clamp(35px,10vw,52px)}.x-chapters{gap:24px}.x-chapter-copy{max-width:92%}.x-description{max-width:85%}}
