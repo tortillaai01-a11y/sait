@@ -7,24 +7,24 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});
  renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
- renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
  const scene=new THREE.Scene();
  const camera=new THREE.PerspectiveCamera(31,1,.1,100);camera.position.set(-10,6.3,11.5);camera.lookAt(0,1.4,0);
  const pmrem=new THREE.PMREMGenerator(renderer);
  const room=new RoomEnvironment();const env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();
- const light=new THREE.DirectionalLight('#ffffff',3);light.position.set(-5,9,5);light.castShadow=true;light.shadow.mapSize.set(1024,1024);light.shadow.camera.left=-9;light.shadow.camera.right=9;light.shadow.camera.top=9;light.shadow.camera.bottom=-9;light.shadow.normalBias=.04;scene.add(light);
- const fill=new THREE.DirectionalLight('#b5a4ff',2);fill.position.set(4,5,-6);scene.add(fill);
- scene.add(new THREE.HemisphereLight('#ffffff','#b6aaba',1.2));
+ const light=new THREE.DirectionalLight('#fff7ed',3.4);light.position.set(-5,9,5);light.castShadow=true;light.shadow.mapSize.set(1024,1024);light.shadow.camera.left=-9;light.shadow.camera.right=9;light.shadow.camera.top=9;light.shadow.camera.bottom=-9;light.shadow.normalBias=.04;scene.add(light);
+ const fill=new THREE.DirectionalLight('#b7d2e2',1.3);fill.position.set(4,5,-6);scene.add(fill);
+ scene.add(new THREE.HemisphereLight('#dbeaf2','#75818a',0.9));
  const silver=new THREE.MeshStandardMaterial({color:'#bdc0c5',metalness:.92,roughness:.24});
- const pearl=new THREE.MeshPhysicalMaterial({color:'#625b70',metalness:.88,roughness:.22,clearcoat:1,clearcoatRoughness:.12,iridescence:.45,iridescenceIOR:1.3,iridescenceThicknessRange:[120,380]});
+ const pearl=new THREE.MeshPhysicalMaterial({color:'#485861',metalness:.68,roughness:.27,clearcoat:.8,clearcoatRoughness:.18});
  const dark=new THREE.MeshStandardMaterial({color:'#171821',metalness:.65,roughness:.35});
  const rubber=new THREE.MeshStandardMaterial({color:'#14151b',metalness:.03,roughness:.88});
  const glass=new THREE.MeshPhysicalMaterial({color:'#1c2031',metalness:.85,roughness:.12,clearcoat:1});
- const purple=new THREE.MeshStandardMaterial({color:'#8a61f1',metalness:.55,roughness:.27});
- const violetLight=new THREE.MeshStandardMaterial({color:'#cfbcff',emissive:'#8a60ff',emissiveIntensity:1.8});
+ const purple=new THREE.MeshStandardMaterial({color:'#ad2430',metalness:.5,roughness:.33});
+ const violetLight=new THREE.MeshStandardMaterial({color:'#f4dddd',emissive:'#ac2734',emissiveIntensity:.85});
  const chrome=new THREE.MeshStandardMaterial({color:'#e5e6e7',metalness:1,roughness:.13});
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.12}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.position.y=-.02;scene.add(ground);
- const turntable=new THREE.Mesh(new THREE.CylinderGeometry(4.65,4.7,.07,100),new THREE.MeshStandardMaterial({color:'#c7bfd0',metalness:.15,roughness:.8,transparent:true}));turntable.material.depthWrite=false;turntable.position.y=-.075;turntable.receiveShadow=true;scene.add(turntable);
+ const turntable=new THREE.Mesh(new THREE.CylinderGeometry(4.65,4.7,.07,100),new THREE.MeshStandardMaterial({color:'#acb8bc',metalness:.2,roughness:.8,transparent:true}));turntable.material.depthWrite=false;turntable.position.y=-.075;turntable.receiveShadow=true;scene.add(turntable);
  const ringMaterial=purple.clone();ringMaterial.transparent=true;ringMaterial.depthWrite=false;
  const ring=new THREE.Mesh(new THREE.TorusGeometry(4.7,.008,6,128),ringMaterial);ring.rotation.x=Math.PI/2;ring.position.y=-.025;scene.add(ring);
  const truck=new THREE.Group();scene.add(truck);
@@ -120,8 +120,8 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
   new THREE.Vector3(4.5,.005,0),new THREE.Vector3(0,.005,0),
   new THREE.Vector3(-1.5,.005,-2),new THREE.Vector3(.8,.005,-4),new THREE.Vector3(8,.005,-4),
  ]);
- const roadMaterial=new THREE.MeshBasicMaterial({color:'#c7c0d0',transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
- const roadLineMaterial=new THREE.MeshBasicMaterial({color:'#a08cb8',transparent:true,opacity:0,depthWrite:false});
+ const roadMaterial=new THREE.MeshBasicMaterial({color:'#b6c4c9',transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+ const roadLineMaterial=new THREE.MeshBasicMaterial({color:'#72868f',transparent:true,opacity:0,depthWrite:false});
  function roadStrip(curve,width){
   const vertices=[],indices=[];
   for(let i=0;i<=100;i++){
@@ -135,7 +135,7 @@ export function createTruckScene(canvas,{reducedMotion=false}={}) {
  const roadMesh=mesh(roadStrip(roadCurve,2.75),roadMaterial,route);roadMesh.castShadow=false;roadMesh.receiveShadow=false;
  const centerline=mesh(new THREE.TubeGeometry(roadCurve,100,.018,6,false),roadLineMaterial,route);centerline.position.y=.01;centerline.castShadow=false;
  const guide=new THREE.Group();truck.add(guide);
- const guideMaterial=new THREE.LineBasicMaterial({color:'#a58bc4',transparent:true,opacity:.3});
+ const guideMaterial=new THREE.LineBasicMaterial({color:'#ae3442',transparent:true,opacity:.3});
  [-1,1].forEach(sign=>{
   const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-2.1,.65,sign*1.02),new THREE.Vector3(-2.1,.65,sign*2.05)]);
   guide.add(new THREE.Line(geo,guideMaterial));

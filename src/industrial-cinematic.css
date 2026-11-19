@@ -1,0 +1,124 @@
+/* KОМ-АВТО: cinematic industrial art direction.
+   This layer is deliberately separate from the original prototype.
+   The original brand logo images remain unchanged. */
+:root {
+  --ink: #172127;
+  --paper: #f0f2f1;
+  --violet: #b82734;
+  --line: #17212726;
+  color: var(--ink);
+  background: var(--paper);
+}
+body { background: var(--paper); }
+::selection { background: #b8273440; color: #162027; }
+button:focus-visible, a:focus-visible, canvas:focus-visible {
+  outline-color: #b82734;
+}
+.x-stage {
+  background:
+    radial-gradient(ellipse 66% 70% at 72% 46%, #d2dce0 0%, #e7ecec 58%, #f0f2f1 100%);
+}
+.x-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .25;
+  background-image:
+    linear-gradient(#6f848c19 1px, transparent 1px),
+    linear-gradient(90deg, #6f848c19 1px, transparent 1px);
+  background-size: 86px 86px;
+  mask-image: linear-gradient(90deg, transparent 0%, black 45%, black 100%);
+}
+.x-header { border-bottom-color: #1d303125; }
+.x-header nav a { transition: color .25s ease; }
+.x-header nav a:hover,
+.x-header-phone:hover { color: #b82734; }
+.x-ghost { color: #b5c0c329; }
+.x-coordinates { color: #63727b; }
+.x-eyebrow { color: #66757d; font-weight: 600; letter-spacing: 1.8px; }
+.x-chapter-copy h1 { color: #162027; letter-spacing: -.069em; }
+.x-chapter-copy h1 em { color: #b82734; }
+.x-description { color: #5c6a73; max-width: 370px; }
+.x-primary {
+  background: #182831;
+  border-color: #182831;
+  color: #fff;
+  box-shadow: 0 4px 0 #0c151b90;
+}
+.x-primary:hover {
+  background: #b82734;
+  border-color: #b82734;
+  box-shadow: 0 6px 0 #7e142255;
+}
+.x-part-note { color: #5d6972; }
+.x-part-note > span { border-color: #b8273480; }
+.x-part-note small { color: #8b999f; }
+.x-canvas-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 54% 48%, transparent 40%, #f1f3f20b 70%, #f1f3f255 100%);
+  pointer-events: none;
+}
+.x-loading { color: #536775; }
+.x-loading > span { border-color: #b4c0c7; border-right-color: #b82734; }
+.x-orbit-label, .x-scroll { color: #586c76; }
+.x-status-dot { background: #b82734; }
+.x-scroll-icon { border-color: #85959d; }
+.x-scroll-icon::before { background: #b82734; }
+.x-chapters button { color: #6b7a82; }
+.x-chapters button[aria-current] { color: #162027; font-weight: 700; }
+.x-chapters button[aria-current]::before { background: #b82734; }
+.x-chapters button:hover { color: #b82734; }
+.x-scene-number { color: #243138; }
+.x-scene-number > span { color: #78878d; }
+.x-progress { background: #cbd4d8; }
+.x-progress > span { background: #b82734; }
+.x-motion-toggle {
+  background: #f0f2f1e6;
+  border-color: #8a9ba555;
+  color: #53636e;
+}
+.x-motion-toggle:hover { color: #b82734; border-color: #b82734; }
+.x-motion-toggle[aria-pressed=true] { background: #dbe3e5; }
+.x-route-note { color: #40525b; }
+.x-route-note small { color: #657a83; }
+.x-directions {
+  background: radial-gradient(ellipse at 92% 2%, #293944 0%, #192329 38%, #121a20 100%);
+  color: #f3f6f5;
+}
+.x-section-top { border-bottom-color: #c0cfd52c; }
+.x-section-top .x-eyebrow { color: #bbc7cc; }
+.x-section-top > span { color: #9aacb4; }
+.x-directions h2 em { color: #e45e63; }
+.x-direction { border-top-color: #cad8df26; }
+.x-direction:last-child { border-bottom-color: #cad8df26; }
+.x-direction-number { color: #d46c71; }
+.x-direction small { color: #b0bec6; }
+.x-direction:hover { color: #f7b6b9; }
+.x-direction-arrow { border-color: #c8d5db55; }
+.x-direction:hover .x-direction-arrow { background: #b82734; border-color: #b82734; }
+.x-contact {
+  background: linear-gradient(120deg, #e7edee 0%, #d9e2e5 100%);
+}
+.x-contact .x-eyebrow { color: #65757d; }
+.x-contact h2 { color: #1d2a31; }
+.x-contact h2 em { color: #b82734; }
+.x-contact-info p { color: #52646e; }
+.x-contact-info > a:hover { color: #b82734; }
+.x-footer { background: #dbe4e6; border-top-color: #192a3120; }
+.x-footer > span, .x-footer small { color: #52646c; }
+.x-footer a:hover { color: #b82734; }
+.x-dialog {
+  background: #f3f5f4;
+  color: #1b2b32;
+  border-top-color: #b82734;
+}
+.x-dialog::backdrop { background: #0b161cc4; }
+@media(max-width: 700px) {
+  .x-stage::before { opacity: .16; background-size: 58px 58px; }
+  .x-ghost { color: #b8c4c52b; }
+  .x-description { color: #43535c; }
+}
