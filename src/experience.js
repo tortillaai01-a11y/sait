@@ -1,4 +1,5 @@
 import './experience.css';
+import './industrial-cinematic.css';
 import { chapterPositions, getStoryState } from './experience/story-state.js';
 
 const base = import.meta.env.BASE_URL;
