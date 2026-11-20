@@ -1,114 +1,154 @@
-import './premium.css';
+import "./premium.css";
 
-const base = import.meta.env.BASE_URL;
-const page = (name) => base === '/' ? '/' + name : base + '?page=' + name;
-const services = [
-  { id: 'parts', title: 'Запчасти', text: 'Подбираем детали для двигателя, трансмиссии, ходовой и тормозной системы грузовых автомобилей.', action: 'Подобрать запчасть', phone: '+79200140062' },
-  { id: 'service', title: 'Грузовой сервис', text: 'Проводим диагностику и ТО, ремонтируем двигатели, коробки передач и ходовую в Арзамасе.', action: 'Записаться в сервис', phone: '+79200140062', details: 'truckrepairs' },
-  { id: 'cargo', title: 'Грузоперевозки', text: 'Подбираем транспорт и маршрут по России и СНГ, помогаем с документами и согласуем условия доставки.', action: 'Рассчитать перевозку', phone: '+79202933359', details: 'cargotransportation' },
-];
+const base = import.meta.env.BASE_URL || "/";
+const asset = (name) => base + "images/" + name;
+const page = (name) => base === "/" ? "/" + name : base + "?page=" + name;
+const partsPhoto = "https://unsplash.com/photos/CcN73HBXNkU/download?force=true&w=1800";
+const repairPhoto = "https://unsplash.com/photos/erWc6mrOq_I/download?force=true&w=1800";
 
-document.querySelector('#app').innerHTML = `
-  <a class="skip" href="#main">Перейти к содержанию</a>
-  <header class="header" id="top">
-    <div class="wrap header-inner">
-      <a class="brand" href="${base}"><img src="${base}images/logo-white.png" alt="КОМ-АВТО" width="110" height="70"></a>
-      <button class="menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false"><span aria-hidden="true"></span>Меню</button>
-      <nav id="site-nav" aria-label="Основная навигация"><a href="#x-directions">Направления</a><a href="#contacts">Контакты</a></nav>
-      <a class="header-phone" href="tel:+79200140062">+7 (920) 014-00-62</a>
-    </div>
-  </header>
-  <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <picture class="hero-photo">
-        <source srcset="${base}images/hero-truck.webp" type="image/webp">
-        <img src="${base}images/hero-truck.png" width="1424" height="800" alt="" fetchpriority="high">
-      </picture>
-      <div class="wrap hero-inner">
-        <div class="hero-copy">
-          <p class="hero-brand">КОМ-АВТО</p>
-          <h1 id="hero-title">Ваш бизнес<br>в движении</h1>
-          <p>Запчасти, грузовой сервис и грузоперевозки по России и СНГ.</p>
-          <div class="actions">${services.map(({ id, action }, index) => `<a class="button ${index === 0 ? 'primary' : 'secondary'}" href="#${id}">${action}</a>`).join('')}</div>
-        </div>
-      </div>
-    </section>
-    <section class="wrap directions" id="x-directions" aria-labelledby="directions-title">
-      <h2 id="directions-title">Наши направления</h2>
-      <div class="services">${services.map((service) => `
-        <article class="service" id="${service.id}" data-reveal>
-          <h3>${service.title}</h3><p>${service.text}</p>
-          <div class="service-links"><a href="tel:${service.phone}">${service.action}</a>${service.details ? `<a href="${page(service.details)}">Подробнее</a>` : ''}</div>
-        </article>`).join('')}
-      </div>
-    </section>
-    <section class="advantages" aria-labelledby="advantages-title">
-      <div class="wrap" data-reveal>
-        <h2 id="advantages-title">Как мы работаем</h2>
-        <dl>
-          <div><dt>Подбор по технике</dt><dd>Уточняем модель и узел, для которого нужна деталь.</dd></div>
-          <div><dt>Сервис в Арзамасе</dt><dd>Обсуждаем симптомы и согласуем, когда привезти машину.</dd></div>
-          <div><dt>Перевозка под задачу</dt><dd>Учитываем тип груза, маршрут и температурный режим.</dd></div>
-        </dl>
-      </div>
-    </section>
-    <section class="contact" id="contacts" aria-labelledby="contact-title">
-      <div class="wrap contact-inner" data-reveal>
-        <div><h2 id="contact-title">Обсудим вашу задачу</h2><p>Арзамас, ул. Калинина, 58, офис 108</p></div>
-        <div class="contact-links">
-          <a href="tel:+79200140062"><span>Запчасти и сервис</span> +7 (920) 014-00-62</a>
-          <a href="tel:+79202933359"><span>Грузоперевозки</span> +7 (920) 293-33-59</a>
-          <a href="https://t.me/Kom_Avto">Написать в Telegram</a>
-          <a href="mailto:Kom-avto52@yandex.ru">Kom-avto52@yandex.ru</a>
-          <a href="${page('contacts')}">Все контакты</a>
-        </div>
-      </div>
-    </section>
-  </main>
-  <footer class="wrap footer"><span>© ${new Date().getFullYear()} КОМ-АВТО</span><a href="${page('privacy')}">Конфиденциальность</a><a href="#top">Наверх</a></footer>
-`;
+document.getElementById("app").innerHTML = [
+  '<a class="skip" href="#story">Перейти к содержанию</a>',
+  '<div class="page-progress" aria-hidden="true"><span></span></div>',
+  '<header class="masthead"><a class="wordmark" href="#intro" aria-label="КОМ-АВТО — к началу">',
+  '<img src="' + asset("logo-white.png") + '" alt="" width="68" height="46"><span>КОМ-АВТО</span></a>',
+  '<nav class="topnav" id="main-nav" aria-label="Разделы сайта">',
+  '<a href="#parts">01 / ЗАПЧАСТИ</a><a href="#service">02 / СЕРВИС</a><a href="#cargo">03 / ПЕРЕВОЗКИ</a>',
+  '<a class="contact-nav" href="#contacts">КОНТАКТЫ ↗</a></nav>',
+  '<button class="nav-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Открыть меню"><span></span><span></span><span></span></button></header>',
+  '<main id="story">',
+  '<section class="chapter intro" id="intro" data-scene="intro" aria-labelledby="intro-title">',
+  '<div class="stage intro-stage">',
+  '<div class="intro-glow" aria-hidden="true"></div><div class="intro-lines" aria-hidden="true"></div>',
+  '<div class="intro-emblem" aria-hidden="true"><span class="outer-orbit"></span><span class="inner-orbit"></span>',
+  '<img src="' + asset("logo-white.png") + '" alt=""></div>',
+  '<div class="scene-index"><span>КОМ-АВТО / 00</span><span>ТЕХНИКА. ТОЧНОСТЬ. ДВИЖЕНИЕ.</span></div>',
+  '<div class="intro-copy"><p class="eyebrow">ТРИ НАПРАВЛЕНИЯ. ОДНА КОМПАНИЯ.</p>',
+  '<h1 id="intro-title">ОТ ДЕТАЛИ<span class="h1-second">ДО ДОРОГИ<span class="dot">.</span></span></h1>',
+  '<p>Запчасти, грузовой сервис и грузоперевозки. Всё начинается с надёжной техники.</p>',
+  '<a class="text-action" href="#parts">СМОТРЕТЬ ИСТОРИЮ <span>↘</span></a></div>',
+  '<div class="scroll-hint" aria-hidden="true">ПРОКРУТИТЕ ВНИЗ <span>↓</span></div>',
+  '</div></section>',
+  '<section class="chapter parts" id="parts" data-scene="parts" aria-labelledby="parts-title">',
+  '<div class="stage photo-stage"><div class="scene-image parts-image">',
+  '<img src="' + partsPhoto + '" alt="Детали и механизмы грузового двигателя" loading="lazy" decoding="async">',
+  '</div><div class="scene-fallback gear-a" aria-hidden="true">⚙</div>',
+  '<div class="photo-shade"></div><div class="scanline" aria-hidden="true"></div>',
+  '<div class="scene-index"><span>КОМ-АВТО / 01</span><span>ТОЧНОСТЬ В КАЖДОЙ ДЕТАЛИ</span></div>',
+  '<div class="scene-content"><p class="eyebrow">01 / ЗАПЧАСТИ</p>',
+  '<h2 id="parts-title">ВСЁ НАЧИНАЕТСЯ<br><em>С ДЕТАЛИ.</em></h2>',
+  '<p>Двигатель, трансмиссия, тормоза, ходовая. Подберём то, что нужно именно вашей машине.</p>',
+  '<a class="scene-cta" href="tel:+79200140062">ПОДОБРАТЬ ЗАПЧАСТЬ <span>↗</span></a></div>',
+  '<div class="chapter-meter"><span>01</span><div><i></i></div><span>03</span></div>',
+  '</div></section>',
+  '<section class="chapter service" id="service" data-scene="service" aria-labelledby="service-title">',
+  '<div class="stage photo-stage"><div class="scene-image service-image">',
+  '<img src="' + repairPhoto + '" alt="Механик проводит диагностику двигателя в мастерской" loading="lazy" decoding="async">',
+  '</div><div class="service-sparks" aria-hidden="true"></div>',
+  '<div class="photo-shade"></div><div class="scanline" aria-hidden="true"></div>',
+  '<div class="scene-index"><span>КОМ-АВТО / 02</span><span>ТЕХНИКА ДОЛЖНА РАБОТАТЬ</span></div>',
+  '<div class="scene-content"><p class="eyebrow">02 / ГРУЗОВОЙ СЕРВИС</p>',
+  '<h2 id="service-title">ОТ ДИАГНОСТИКИ<br><em>ДО РЕШЕНИЯ.</em></h2>',
+  '<p>Профессиональный подход к обслуживанию и ремонту грузовой техники в Арзамасе.</p>',
+  '<a class="scene-cta" href="tel:+79200140062">ЗАПИСАТЬСЯ В СЕРВИС <span>↗</span></a>',
+  '<a class="secondary-link" href="' + page("truckrepairs") + '">УЗНАТЬ О СЕРВИСЕ ↗</a></div>',
+  '<div class="chapter-meter"><span>02</span><div><i></i></div><span>03</span></div>',
+  '</div></section>',
+  '<section class="chapter cargo" id="cargo" data-scene="cargo" aria-labelledby="cargo-title">',
+  '<div class="stage photo-stage"><div class="scene-image cargo-image">',
+  '<picture><source srcset="' + asset("hero-truck.webp") + '" type="image/webp">',
+  '<img src="' + asset("hero-truck.png") + '" alt="Фура КОМ-АВТО движется навстречу камере по мокрой трассе на закате" loading="eager" fetchpriority="high" width="1424" height="800"></picture>',
+  '</div><div class="cargo-light" aria-hidden="true"></div>',
+  '<div class="photo-shade"></div><div class="scene-index"><span>КОМ-АВТО / 03</span><span>ДОРОГА ПРОДОЛЖАЕТСЯ</span></div>',
+  '<div class="scene-content"><p class="eyebrow">03 / ГРУЗОПЕРЕВОЗКИ</p>',
+  '<h2 id="cargo-title">ТЕХНИКА ГОТОВА.<br><em>ВРЕМЯ В ПУТЬ.</em></h2>',
+  '<p>Грузоперевозки по России и СНГ. Подбираем транспорт и маршрут под вашу задачу.</p>',
+  '<a class="scene-cta" href="tel:+79202933359">РАССЧИТАТЬ ПЕРЕВОЗКУ <span>↗</span></a>',
+  '<a class="secondary-link" href="' + page("cargotransportation") + '">О ПЕРЕВОЗКАХ ↗</a></div>',
+  '<div class="chapter-meter"><span>03</span><div><i></i></div><span>03</span></div>',
+  '</div></section>',
+  '<section class="final-section" id="contacts">',
+  '<div class="final-mark"><img src="' + asset("logo-white.png") + '" alt="Оригинальный логотип КОМ-АВТО"></div>',
+  '<p class="eyebrow">КОМ-АВТО / ВСЕГДА НА СВЯЗИ</p><h2>ЕСТЬ ЗАДАЧА?<br><em>ОБСУДИМ.</em></h2>',
+  '<div class="final-grid"><a href="tel:+79200140062"><span>ЗАПЧАСТИ / СЕРВИС</span><strong>+7 (920) 014-00-62</strong><i>↗</i></a>',
+  '<a href="tel:+79202933359"><span>ГРУЗОПЕРЕВОЗКИ</span><strong>+7 (920) 293-33-59</strong><i>↗</i></a>',
+  '<a href="https://t.me/Kom_Avto"><span>TELEGRAM</span><strong>НАПИСАТЬ НАМ</strong><i>↗</i></a></div>',
+  '<footer><span>© ' + new Date().getFullYear() + ' КОМ-АВТО</span><span>АРЗАМАС · РОССИЯ</span>',
+  '<a href="' + page("contacts") + '">ВСЕ КОНТАКТЫ</a><a href="' + page("privacy") + '">КОНФИДЕНЦИАЛЬНОСТЬ</a></footer>',
+  '</section></main>'
+].join("");
 
-const menu = document.querySelector('.menu-toggle');
-const nav = document.querySelector('#site-nav');
-const initialAnchor = document.getElementById(location.hash.slice(1));
-if (initialAnchor) initialAnchor.scrollIntoView({ behavior: 'instant' });
-const setMenu = (open) => menu.setAttribute('aria-expanded', String(open));
-menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') === 'false'));
-nav.addEventListener('click', (event) => {
-  const link = event.target.closest('a');
-  if (!link || getComputedStyle(menu).display === 'none') return;
-  setMenu(false);
-  const section = document.querySelector(link.hash);
-  section.tabIndex = -1;
-  section.focus({ preventScroll: true });
+const chapters = Array.from(document.querySelectorAll(".chapter"));
+const progressBar = document.querySelector(".page-progress span");
+const menu = document.querySelector(".nav-toggle");
+const nav = document.querySelector(".topnav");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+let ticking = false;
+
+function clamp(value, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, value));
+}
+function mapRange(value, start, end) {
+  return clamp((value - start) / (end - start));
+}
+function render() {
+  ticking = false;
+  const viewHeight = window.innerHeight;
+  const allScroll = Math.max(1, document.documentElement.scrollHeight - viewHeight);
+  progressBar.style.transform = "scaleX(" + clamp(window.scrollY / allScroll) + ")";
+  for (const chapter of chapters) {
+    const rect = chapter.getBoundingClientRect();
+    const travel = Math.max(1, rect.height - viewHeight);
+    const progress = clamp(-rect.top / travel);
+    const visible = rect.bottom > 0 && rect.top < viewHeight;
+    chapter.style.setProperty("--p", String(progress));
+    chapter.style.setProperty("--enter", String(mapRange(progress, 0.07, 0.39)));
+    chapter.style.setProperty("--exit", String(mapRange(progress, 0.71, 0.97)));
+    chapter.style.setProperty("--light", String(mapRange(progress, 0.13, 0.86)));
+    chapter.classList.toggle("is-visible", visible);
+    chapter.classList.toggle("is-active", rect.top < viewHeight * 0.45 && rect.bottom > viewHeight * 0.55);
+  }
+  const current = chapters.find(c => c.classList.contains("is-active"));
+  if (current) {
+    document.querySelectorAll(".topnav a[href^='#']").forEach(link => {
+      const selected = link.getAttribute("href") === "#" + current.id;
+      if (selected) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    });
+  }
+}
+function requestRender() {
+  if (!ticking) {
+    ticking = true;
+    window.requestAnimationFrame(render);
+  }
+}
+window.addEventListener("scroll", requestRender, { passive: true });
+window.addEventListener("resize", requestRender);
+window.addEventListener("load", requestRender);
+requestRender();
+
+menu.addEventListener("click", () => {
+  const open = menu.getAttribute("aria-expanded") !== "true";
+  menu.setAttribute("aria-expanded", String(open));
+  menu.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
+  document.body.classList.toggle("menu-open", open);
 });
-document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape' || menu.getAttribute('aria-expanded') !== 'true') return;
-  setMenu(false);
-  menu.focus();
+nav.addEventListener("click", event => {
+  if (event.target.closest("a")) {
+    menu.setAttribute("aria-expanded", "false");
+    menu.setAttribute("aria-label", "Открыть меню");
+    document.body.classList.remove("menu-open");
+  }
 });
-
-const motion = matchMedia('(prefers-reduced-motion: no-preference) and (min-width: 901px)');
-const hero = document.querySelector('.hero');
-let frame = 0;
-window.addEventListener('scroll', () => {
-  if (!motion.matches || frame) return;
-  frame = requestAnimationFrame(() => {
-    hero.style.setProperty('--photo-shift', Math.min(window.scrollY * 0.065, 38) + 'px');
-    frame = 0;
-  });
-}, { passive: true });
-
-if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.classList.add('revealed');
-      observer.unobserve(entry.target);
-    }
-  }, { threshold: 0.12 });
-  document.querySelectorAll('[data-reveal]').forEach((item) => {
-    item.classList.add('reveal');
-    observer.observe(item);
-  });
+window.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    menu.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  }
+});
+document.querySelectorAll(".scene-image img").forEach(img => {
+  img.addEventListener("error", () => img.parentElement.classList.add("photo-unavailable"));
+});
+if (reduceMotion.matches) {
+  document.documentElement.classList.add("reduce-motion");
 }
